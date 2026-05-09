@@ -26,12 +26,19 @@ Con el tiempo puedes consultar promedios semanales, qué actividades se asocian 
 tracker-diario/
 ├── README.md
 ├── .gitignore
+├── requirements.txt
+├── app/
+│   ├── main.py        # Punto de entrada del CLI
+│   ├── db.py          # Conexión y operaciones con SQLite
+│   ├── prompts.py     # Preguntas al usuario y visualización
+│   └── validators.py  # Validación de inputs
 ├── database/
 │   ├── schema.sql     # Definición de las tablas
 │   ├── seed.sql       # Catálogo de actividades y check-ins de ejemplo
 │   └── queries.sql    # Consultas útiles para analizar tus datos
 └── docs/
     ├── data_model.md           # Explicación del modelo de datos
+    ├── cli_flow.md             # Cómo funciona el CLI paso a paso
     └── future_telegram_flow.md # Plan para integrar Telegram en el futuro
 ```
 
@@ -130,6 +137,102 @@ Para ver los IDs de todas las actividades disponibles:
 ```sql
 SELECT id, activity_name, activity_category FROM activities ORDER BY activity_category, activity_name;
 ```
+
+---
+
+## CLI — Registrar check-ins desde terminal
+
+### Requisitos
+
+- Python 3.10 o superior (sin dependencias externas)
+- `tracker.db` ya creada con el esquema y el catálogo de actividades
+
+Verifica tu versión de Python:
+
+```bash
+python --version
+```
+
+### Cómo correr el CLI
+
+Desde la carpeta raíz del proyecto (`tracker-diario/`):
+
+```bash
+python app/main.py
+```
+
+El programa te hará 7 preguntas, validará tus respuestas y guardará el check-in. Al final muestra un resumen visual.
+
+### Ejemplo de sesión
+
+```
+┌──────────────────────────────────┐
+│  Tracker Diario  ·  2026-05-10  │
+└──────────────────────────────────┘
+
+  ¿Cómo estuvo tu ánimo hoy? (1-10): 8
+  ¿Cuánta energía tuviste hoy? (1-10): 7
+  ¿Qué tanto estrés sentiste hoy? (1-10): 3
+
+  ¿Qué tan significativo o nutritivo se sintió tu día?
+    1 = Poco  |  2 = Normal  |  3 = Mucho
+  Tu respuesta (1/2/3): 3
+
+  ¿Qué actividades hiciste hoy? (puedes elegir varias)
+  Escribe los números separados por coma.  Ejemplo: 1,3,7
+
+  Movimiento:
+     1. Bicicleta
+     3. Caminar
+     ...
+  Aprendizaje:
+    13. Claude / IA
+    16. SQL
+
+  Tus actividades: 3,13,16
+
+  ¿Qué fue lo mejor del día?
+  > Terminé el CLI del tracker y funcionó de primera.
+
+  ¿Qué te drenó energía hoy?
+  > La reunión de la mañana se extendió demasiado.
+
+╔══════════════════════════════════════════╗
+║  Check-in guardado  ·  2026-05-10       ║
+╚══════════════════════════════════════════╝
+
+  Ánimo       ████████░░  8/10
+  Energía     ███████░░░  7/10
+  Estrés      ███░░░░░░░  3/10
+  Significado Mucho (3/3)
+
+  Actividades:  Caminar  ·  Claude / IA  ·  SQL
+
+  Lo mejor:     Terminé el CLI del tracker y funcionó de primera.
+  Te drenó:     La reunión de la mañana se extendió demasiado.
+```
+
+### Qué pasa si ingresas un valor inválido
+
+El CLI repite la pregunta con un mensaje de error claro:
+
+```
+  ¿Cómo estuvo tu ánimo hoy? (1-10): quince
+  ✗ 'quince' no es un número. Intenta de nuevo.
+  ¿Cómo estuvo tu ánimo hoy? (1-10): 15
+  ✗ El ánimo debe estar entre 1 y 10.
+  ¿Cómo estuvo tu ánimo hoy? (1-10): 8
+```
+
+### Cancelar en cualquier momento
+
+Presiona `Ctrl+C` para salir sin guardar nada:
+
+```
+  Check-in cancelado. ¡Hasta mañana!
+```
+
+Consulta [`docs/cli_flow.md`](docs/cli_flow.md) para ver el flujo completo con diagramas y tabla de validaciones.
 
 ---
 
