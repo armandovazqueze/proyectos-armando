@@ -1,43 +1,48 @@
 -- ============================================================
 -- tracker-diario | seed.sql
 -- Datos de ejemplo: catálogo de actividades y check-ins
+--
+-- Idempotente: puede correrse más de una vez sin duplicar datos.
+-- INSERT OR IGNORE respeta las constraints UNIQUE del schema.
 -- ============================================================
 
 PRAGMA foreign_keys = ON;
 
 -- ------------------------------------------------------------
 -- Catálogo de actividades
+-- UNIQUE en activity_name evita duplicados si se corre 2 veces
 -- ------------------------------------------------------------
 
 -- Movimiento
-INSERT INTO activities (activity_name, activity_category) VALUES ('Caminar',    'Movimiento');
-INSERT INTO activities (activity_name, activity_category) VALUES ('Bailar',     'Movimiento');
-INSERT INTO activities (activity_name, activity_category) VALUES ('Bicicleta',  'Movimiento');
-INSERT INTO activities (activity_name, activity_category) VALUES ('Ping pong',  'Movimiento');
+INSERT OR IGNORE INTO activities (activity_name, activity_category) VALUES ('Caminar',    'Movimiento');
+INSERT OR IGNORE INTO activities (activity_name, activity_category) VALUES ('Bailar',     'Movimiento');
+INSERT OR IGNORE INTO activities (activity_name, activity_category) VALUES ('Bicicleta',  'Movimiento');
+INSERT OR IGNORE INTO activities (activity_name, activity_category) VALUES ('Ping pong',  'Movimiento');
 
 -- Creativas
-INSERT INTO activities (activity_name, activity_category) VALUES ('Música',          'Creativas');
-INSERT INTO activities (activity_name, activity_category) VALUES ('Cantar',          'Creativas');
-INSERT INTO activities (activity_name, activity_category) VALUES ('Crear contenido', 'Creativas');
+INSERT OR IGNORE INTO activities (activity_name, activity_category) VALUES ('Música',          'Creativas');
+INSERT OR IGNORE INTO activities (activity_name, activity_category) VALUES ('Cantar',          'Creativas');
+INSERT OR IGNORE INTO activities (activity_name, activity_category) VALUES ('Crear contenido', 'Creativas');
 
 -- Sociales
-INSERT INTO activities (activity_name, activity_category) VALUES ('Llamada',        'Sociales');
-INSERT INTO activities (activity_name, activity_category) VALUES ('Salida a cenar', 'Sociales');
-INSERT INTO activities (activity_name, activity_category) VALUES ('Salida a comer', 'Sociales');
-INSERT INTO activities (activity_name, activity_category) VALUES ('Salir a bailar', 'Sociales');
-INSERT INTO activities (activity_name, activity_category) VALUES ('Karaoke',        'Sociales');
+INSERT OR IGNORE INTO activities (activity_name, activity_category) VALUES ('Llamada',        'Sociales');
+INSERT OR IGNORE INTO activities (activity_name, activity_category) VALUES ('Salida a cenar', 'Sociales');
+INSERT OR IGNORE INTO activities (activity_name, activity_category) VALUES ('Salida a comer', 'Sociales');
+INSERT OR IGNORE INTO activities (activity_name, activity_category) VALUES ('Salir a bailar', 'Sociales');
+INSERT OR IGNORE INTO activities (activity_name, activity_category) VALUES ('Karaoke',        'Sociales');
 
 -- Aprendizaje / proyectos
-INSERT INTO activities (activity_name, activity_category) VALUES ('Claude / IA',      'Aprendizaje');
-INSERT INTO activities (activity_name, activity_category) VALUES ('SQL',              'Aprendizaje');
-INSERT INTO activities (activity_name, activity_category) VALUES ('Python',           'Aprendizaje');
-INSERT INTO activities (activity_name, activity_category) VALUES ('Proyecto personal','Aprendizaje');
+INSERT OR IGNORE INTO activities (activity_name, activity_category) VALUES ('Claude / IA',      'Aprendizaje');
+INSERT OR IGNORE INTO activities (activity_name, activity_category) VALUES ('SQL',              'Aprendizaje');
+INSERT OR IGNORE INTO activities (activity_name, activity_category) VALUES ('Python',           'Aprendizaje');
+INSERT OR IGNORE INTO activities (activity_name, activity_category) VALUES ('Proyecto personal','Aprendizaje');
 
 -- ------------------------------------------------------------
 -- Check-ins de ejemplo
+-- UNIQUE en checkin_date evita duplicados si se corre 2 veces
 -- ------------------------------------------------------------
 
-INSERT INTO daily_checkins (
+INSERT OR IGNORE INTO daily_checkins (
     checkin_date, mood_score, energy_score, stress_score,
     meaningfulness_level, best_part_of_day, energy_drainer
 ) VALUES (
@@ -46,7 +51,7 @@ INSERT INTO daily_checkins (
     'Reunión que se extendió más de lo necesario.'
 );
 
-INSERT INTO daily_checkins (
+INSERT OR IGNORE INTO daily_checkins (
     checkin_date, mood_score, energy_score, stress_score,
     meaningfulness_level, best_part_of_day, energy_drainer
 ) VALUES (
@@ -55,7 +60,7 @@ INSERT INTO daily_checkins (
     'Muchas notificaciones y correos sin respuesta.'
 );
 
-INSERT INTO daily_checkins (
+INSERT OR IGNORE INTO daily_checkins (
     checkin_date, mood_score, energy_score, stress_score,
     meaningfulness_level, best_part_of_day, energy_drainer
 ) VALUES (
@@ -64,7 +69,7 @@ INSERT INTO daily_checkins (
     'Tráfico de regreso a casa.'
 );
 
-INSERT INTO daily_checkins (
+INSERT OR IGNORE INTO daily_checkins (
     checkin_date, mood_score, energy_score, stress_score,
     meaningfulness_level, best_part_of_day, energy_drainer
 ) VALUES (
@@ -73,7 +78,7 @@ INSERT INTO daily_checkins (
     'Deadline apretado que llegó sin aviso.'
 );
 
-INSERT INTO daily_checkins (
+INSERT OR IGNORE INTO daily_checkins (
     checkin_date, mood_score, energy_score, stress_score,
     meaningfulness_level, best_part_of_day, energy_drainer
 ) VALUES (
@@ -84,7 +89,7 @@ INSERT INTO daily_checkins (
 
 -- ------------------------------------------------------------
 -- Actividades asociadas a cada check-in
--- (los IDs de actividades corresponden al orden del INSERT arriba)
+-- UNIQUE (checkin_id, activity_id) evita duplicados
 -- Movimiento: Caminar=1, Bailar=2, Bicicleta=3, Ping pong=4
 -- Creativas:  Música=5, Cantar=6, Crear contenido=7
 -- Sociales:   Llamada=8, Salida a cenar=9, Salida a comer=10,
@@ -93,24 +98,24 @@ INSERT INTO daily_checkins (
 -- ------------------------------------------------------------
 
 -- 2026-05-05: Claude/IA + SQL + Proyecto personal
-INSERT INTO checkin_activities (checkin_id, activity_id) VALUES (1, 13);
-INSERT INTO checkin_activities (checkin_id, activity_id) VALUES (1, 14);
-INSERT INTO checkin_activities (checkin_id, activity_id) VALUES (1, 16);
+INSERT OR IGNORE INTO checkin_activities (checkin_id, activity_id) VALUES (1, 13);
+INSERT OR IGNORE INTO checkin_activities (checkin_id, activity_id) VALUES (1, 14);
+INSERT OR IGNORE INTO checkin_activities (checkin_id, activity_id) VALUES (1, 16);
 
 -- 2026-05-06: Caminar + Llamada
-INSERT INTO checkin_activities (checkin_id, activity_id) VALUES (2, 1);
-INSERT INTO checkin_activities (checkin_id, activity_id) VALUES (2, 8);
+INSERT OR IGNORE INTO checkin_activities (checkin_id, activity_id) VALUES (2, 1);
+INSERT OR IGNORE INTO checkin_activities (checkin_id, activity_id) VALUES (2, 8);
 
 -- 2026-05-07: Cantar + Karaoke + Salir a bailar
-INSERT INTO checkin_activities (checkin_id, activity_id) VALUES (3, 6);
-INSERT INTO checkin_activities (checkin_id, activity_id) VALUES (3, 12);
-INSERT INTO checkin_activities (checkin_id, activity_id) VALUES (3, 11);
+INSERT OR IGNORE INTO checkin_activities (checkin_id, activity_id) VALUES (3, 6);
+INSERT OR IGNORE INTO checkin_activities (checkin_id, activity_id) VALUES (3, 12);
+INSERT OR IGNORE INTO checkin_activities (checkin_id, activity_id) VALUES (3, 11);
 
 -- 2026-05-08: Python + Proyecto personal
-INSERT INTO checkin_activities (checkin_id, activity_id) VALUES (4, 15);
-INSERT INTO checkin_activities (checkin_id, activity_id) VALUES (4, 16);
+INSERT OR IGNORE INTO checkin_activities (checkin_id, activity_id) VALUES (4, 15);
+INSERT OR IGNORE INTO checkin_activities (checkin_id, activity_id) VALUES (4, 16);
 
 -- 2026-05-09: SQL + Claude/IA + Caminar
-INSERT INTO checkin_activities (checkin_id, activity_id) VALUES (5, 14);
-INSERT INTO checkin_activities (checkin_id, activity_id) VALUES (5, 13);
-INSERT INTO checkin_activities (checkin_id, activity_id) VALUES (5, 1);
+INSERT OR IGNORE INTO checkin_activities (checkin_id, activity_id) VALUES (5, 14);
+INSERT OR IGNORE INTO checkin_activities (checkin_id, activity_id) VALUES (5, 13);
+INSERT OR IGNORE INTO checkin_activities (checkin_id, activity_id) VALUES (5, 1);

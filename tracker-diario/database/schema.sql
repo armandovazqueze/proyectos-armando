@@ -11,7 +11,7 @@ PRAGMA foreign_keys = ON;
 -- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS activities (
     id               INTEGER PRIMARY KEY AUTOINCREMENT,
-    activity_name    TEXT    NOT NULL,
+    activity_name    TEXT    NOT NULL UNIQUE,
     activity_category TEXT   NOT NULL,
     active           INTEGER NOT NULL DEFAULT 1 CHECK (active IN (0, 1)),
     created_at       TEXT    NOT NULL DEFAULT (datetime('now', 'localtime'))
