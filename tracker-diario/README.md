@@ -236,6 +236,67 @@ Consulta [`docs/cli_flow.md`](docs/cli_flow.md) para ver el flujo completo con d
 
 ---
 
+## Dashboard local
+
+El dashboard permite explorar los datos del tracker desde el navegador sin necesidad de abrir la terminal de SQLite.
+
+### Estructura del dashboard
+
+```
+dashboard/
+├── app.py          # Punto de entrada de Streamlit; orquesta las secciones
+├── data_loader.py  # Consultas SQL → DataFrames de pandas
+├── charts.py       # Gráficas de Plotly (timeline, actividades)
+└── filters.py      # Funciones puras de filtrado por fecha, significado y actividad
+```
+
+`app.py` no contiene lógica de negocio; delega la carga de datos a `data_loader.py`, el filtrado a `filters.py` y las gráficas a `charts.py`.
+
+### Cómo se conecta a tracker.db
+
+`data_loader.py` busca `tracker.db` en la carpeta raíz del proyecto usando la ruta relativa al archivo:
+
+```
+dashboard/data_loader.py → ../tracker.db
+```
+
+La ruta se resuelve automáticamente desde cualquier directorio desde el que corras Streamlit, siempre que uses la ruta completa al script.
+
+### Instalar dependencias
+
+Desde la carpeta raíz del proyecto (`tracker-diario/`):
+
+```bash
+pip install -r requirements.txt
+```
+
+### Correr el dashboard
+
+```bash
+streamlit run dashboard/app.py
+```
+
+Streamlit abre el navegador automáticamente en `http://localhost:8501`.
+
+Si el navegador no abre solo, copia esa URL y pégala manualmente.
+
+### Qué muestra el dashboard
+
+| Sección | Contenido |
+|---|---|
+| Resumen general | Total de check-ins y promedios de ánimo, energía, estrés y significado |
+| Timeline | Gráfica de líneas con la evolución temporal de las métricas |
+| Actividades | Frecuencia, ánimo promedio, estrés promedio y significado promedio por actividad |
+| Tabla detallada | Todos los check-ins con fecha, scores, actividades y textos libres |
+
+### Filtros disponibles
+
+- **Rango de fechas** — limita todas las secciones al período seleccionado
+- **Significado del día** — filtra por Poco / Normal / Mucho
+- **Actividad** — muestra solo los días en que se realizó esa actividad (aplica al resumen, timeline y tabla; no a las estadísticas de actividades)
+
+---
+
 ## Cómo subir esto a GitHub
 
 ```bash

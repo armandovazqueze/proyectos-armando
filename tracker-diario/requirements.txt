@@ -1,9 +1,8 @@
-# tracker-diario no requiere dependencias externas.
-# Usa únicamente la biblioteca estándar de Python:
-#   - sqlite3     (base de datos)
-#   - pathlib     (rutas de archivos)
-#   - contextlib  (context manager para la conexión)
-#   - datetime    (fecha del check-in)
-#   - sys         (salida del programa)
-#
+# CLI — usa únicamente la biblioteca estándar de Python:
+#   sqlite3, pathlib, contextlib, datetime, sys
 # Requisito mínimo: Python 3.10 o superior.
+
+# Dashboard
+streamlit>=1.32
+pandas>=2.0
+plotly>=5.18
