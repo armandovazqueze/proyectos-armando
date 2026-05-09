@@ -237,4 +237,5 @@ def build_conversation_handler() -> ConversationHandler:
         fallbacks=[CommandHandler("cancel", cmd_cancel)],
         per_user=True,
         per_chat=True,
+        per_message=False,  # track state per user/chat, not per message
     )

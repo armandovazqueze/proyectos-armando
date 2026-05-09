@@ -11,6 +11,7 @@ it is guaranteed to run inside the already-running event loop.
 import logging
 import os
 import sys
+import warnings
 from pathlib import Path
 
 # Ensure project root is on sys.path so 'from app.db import ...' and
@@ -21,6 +22,10 @@ if str(_ROOT) not in sys.path:
 
 from dotenv import load_dotenv  # noqa: E402
 from telegram.ext import Application, CommandHandler  # noqa: E402
+from telegram.warnings import PTBUserWarning  # noqa: E402
+
+# Per-message tracking warning is expected for sequential ConversationHandlers.
+warnings.filterwarnings("ignore", message=".*per_message.*", category=PTBUserWarning)
 
 from telegram_bot.handlers import build_conversation_handler, cmd_start  # noqa: E402
 from telegram_bot.scheduler import setup_scheduler  # noqa: E402
