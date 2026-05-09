@@ -1,0 +1,156 @@
+# tracker-diario
+
+Tracker diario personal basado en SQLite. Registra tu estado emocional, energía, estrés y actividades cada día para descubrir patrones en tu bienestar.
+
+---
+
+## ¿Qué hace este proyecto?
+
+Cada día puedes guardar un check-in con:
+
+- **Ánimo** (1–10)
+- **Energía** (1–10)
+- **Estrés** (1–10)
+- **Qué tan significativo fue el día** (1 = Poco · 2 = Normal · 3 = Mucho)
+- **Actividades realizadas** (de un catálogo: Movimiento, Creativas, Sociales, Aprendizaje)
+- **Lo mejor del día**
+- **Qué te drenó energía**
+
+Con el tiempo puedes consultar promedios semanales, qué actividades se asocian con mejor ánimo, y mucho más.
+
+---
+
+## Estructura del proyecto
+
+```
+tracker-diario/
+├── README.md
+├── .gitignore
+├── database/
+│   ├── schema.sql     # Definición de las tablas
+│   ├── seed.sql       # Catálogo de actividades y check-ins de ejemplo
+│   └── queries.sql    # Consultas útiles para analizar tus datos
+└── docs/
+    ├── data_model.md           # Explicación del modelo de datos
+    └── future_telegram_flow.md # Plan para integrar Telegram en el futuro
+```
+
+---
+
+## Cómo crear la base de datos SQLite
+
+Necesitas tener SQLite instalado. Verifica con:
+
+```bash
+sqlite3 --version
+```
+
+Si no lo tienes, instálalo:
+
+```bash
+# macOS
+brew install sqlite
+
+# Ubuntu / Debian
+sudo apt install sqlite3
+```
+
+---
+
+## Cómo correr schema.sql (crear las tablas)
+
+Desde la carpeta raíz del proyecto:
+
+```bash
+sqlite3 tracker.db < database/schema.sql
+```
+
+Esto crea el archivo `tracker.db` con las tres tablas vacías.
+
+---
+
+## Cómo cargar seed.sql (datos de ejemplo)
+
+```bash
+sqlite3 tracker.db < database/seed.sql
+```
+
+Esto inserta el catálogo completo de actividades y 5 check-ins de ejemplo con sus actividades asociadas.
+
+---
+
+## Cómo probar queries.sql
+
+Puedes correr todas las consultas a la vez:
+
+```bash
+sqlite3 tracker.db < database/queries.sql
+```
+
+O abrir una sesión interactiva y copiar/pegar las consultas que quieras:
+
+```bash
+sqlite3 tracker.db
+```
+
+Dentro de la sesión activa te recomendamos activar los encabezados de columna:
+
+```sql
+.headers on
+.mode column
+```
+
+---
+
+## Cómo agregar tu propio check-in
+
+Abre SQLite y usa esta plantilla (ajusta los valores):
+
+```sql
+-- 1. Insertar el check-in del día
+INSERT INTO daily_checkins (
+    checkin_date, mood_score, energy_score, stress_score,
+    meaningfulness_level, best_part_of_day, energy_drainer
+) VALUES (
+    '2026-05-10', 8, 7, 3, 3,
+    'Lo mejor de mi día aquí.',
+    'Lo que me drenó aquí.'
+);
+
+-- 2. Consultar el id del check-in que acabas de crear
+SELECT id FROM daily_checkins WHERE checkin_date = '2026-05-10';
+
+-- 3. Asociar actividades (usa el id del paso anterior)
+INSERT INTO checkin_activities (checkin_id, activity_id) VALUES (6, 1);  -- Caminar
+INSERT INTO checkin_activities (checkin_id, activity_id) VALUES (6, 14); -- SQL
+```
+
+Para ver los IDs de todas las actividades disponibles:
+
+```sql
+SELECT id, activity_name, activity_category FROM activities ORDER BY activity_category, activity_name;
+```
+
+---
+
+## Cómo subir esto a GitHub
+
+```bash
+# Desde la carpeta tracker-diario/
+git init
+git add .
+git commit -m "feat: primera versión del tracker diario con esquema SQLite"
+
+# Crea el repositorio en GitHub y luego:
+git remote add origin https://github.com/tu-usuario/tracker-diario.git
+git branch -M main
+git push -u origin main
+```
+
+> El archivo `.gitignore` ya excluye `*.db` para que la base de datos local no se suba al repositorio.
+
+---
+
+## Próximos pasos
+
+La siguiente fase conectará un bot de Telegram para que puedas hacer el check-in desde el celular sin abrir la terminal. Consulta [`docs/future_telegram_flow.md`](docs/future_telegram_flow.md) para ver el plan.
