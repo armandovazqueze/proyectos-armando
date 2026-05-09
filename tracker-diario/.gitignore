@@ -3,6 +3,9 @@
 *.sqlite
 *.sqlite3
 
+# Variables de entorno con tokens/secrets
+.env
+
 # Archivos del sistema
 .DS_Store
 Thumbs.db

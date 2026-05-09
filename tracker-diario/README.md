@@ -297,6 +297,111 @@ Si el navegador no abre solo, copia esa URL y pégala manualmente.
 
 ---
 
+## Bot de Telegram
+
+El bot permite hacer el check-in diario conversacionalmente desde Telegram, pregunta por pregunta, sin abrir la terminal.
+
+### Estructura del módulo
+
+```
+telegram_bot/
+├── bot.py          # Punto de entrada; crea la Application y arranca el polling
+├── handlers.py     # ConversationHandler: flujo completo de preguntas y respuestas
+├── questions.py    # Textos de preguntas y constructores de teclados inline
+├── scheduler.py    # APScheduler: recordatorio diario a la hora configurada
+└── storage.py      # Puente con tracker.db (reutiliza app/db.py, sin SQL propio)
+```
+
+### Configurar variables de entorno
+
+```bash
+cp .env.example .env
+```
+
+Edita `.env` con tus valores reales:
+
+```
+TELEGRAM_BOT_TOKEN=tu_token_aqui
+TELEGRAM_CHAT_ID=tu_chat_id_aqui
+DAILY_REMINDER_TIME=21:00
+TIMEZONE=America/Mexico_City
+```
+
+### Cómo obtener tu TELEGRAM_BOT_TOKEN
+
+1. Abre Telegram y busca **@BotFather**
+2. Envía `/newbot` y sigue las instrucciones
+3. BotFather te dará un token con el formato `1234567890:AAF...`
+4. Copia ese token en `TELEGRAM_BOT_TOKEN` en tu `.env`
+
+### Cómo obtener tu TELEGRAM_CHAT_ID
+
+1. Instala las dependencias (ver abajo)
+2. Pon tu `TELEGRAM_BOT_TOKEN` en `.env` (el `TELEGRAM_CHAT_ID` puede quedar vacío por ahora)
+3. Corre el bot: `python telegram_bot/bot.py`
+4. Abre tu bot en Telegram y envía `/start`
+5. El bot te responde con tu Chat ID: cópialo y ponlo en `TELEGRAM_CHAT_ID` en tu `.env`
+6. Reinicia el bot con `Ctrl+C` y `python telegram_bot/bot.py`
+
+### Instalar dependencias
+
+```bash
+pip install -r requirements.txt
+```
+
+### Correr el bot
+
+Desde la carpeta raíz del proyecto (`tracker-diario/`):
+
+```bash
+python telegram_bot/bot.py
+```
+
+Deja esta terminal abierta. El bot hace polling y el scheduler corre en el mismo proceso.
+
+### Probar /checkin
+
+1. Con el bot corriendo, abre Telegram y busca tu bot por su nombre
+2. Envía `/checkin`
+3. Responde cada pregunta usando los botones inline o texto libre
+4. Al final recibirás un resumen con el check-in guardado
+
+Flujo de preguntas:
+
+```
+/checkin
+  → Ánimo (1–10)           [botones]
+  → Energía (1–10)         [botones]
+  → Estrés (1–10)          [botones]
+  → Significado (1/2/3)    [botones]
+  → Actividades            [multi-select + botón Listo]
+  → Lo mejor del día       [texto libre, - para omitir]
+  → Qué te drenó energía   [texto libre, - para omitir]
+  → ✅ Check-in guardado
+```
+
+Envía `/cancel` en cualquier momento para abortar el check-in en progreso.
+
+### Verificar que los datos se guardaron en tracker.db
+
+```bash
+sqlite3 tracker.db "SELECT checkin_date, mood_score, energy_score, stress_score FROM daily_checkins ORDER BY checkin_date DESC LIMIT 5;"
+```
+
+O desde el dashboard de Streamlit:
+
+```bash
+streamlit run dashboard/app.py
+```
+
+El dashboard lee la misma `tracker.db` — los check-ins hechos por Telegram aparecen ahí inmediatamente.
+
+### El recordatorio diario
+
+A la hora configurada en `DAILY_REMINDER_TIME` (por defecto `21:00`), el bot te envía un mensaje automático. Cuando llegue, usa `/checkin` para hacer el check-in del día.
+
+---
+
 ## Cómo subir esto a GitHub
 
 ```bash
@@ -317,4 +422,7 @@ git push -u origin main
 
 ## Próximos pasos
 
-La siguiente fase conectará un bot de Telegram para que puedas hacer el check-in desde el celular sin abrir la terminal. Consulta [`docs/future_telegram_flow.md`](docs/future_telegram_flow.md) para ver el plan.
+- Correlaciones entre actividades y bienestar en el dashboard
+- Analytics avanzados: promedios rodantes, detección de patrones
+- Integración con n8n o webhooks para disparar el check-in desde flujos externos
+- Migración opcional a base de datos en la nube cuando sea necesario
