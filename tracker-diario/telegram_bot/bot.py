@@ -21,14 +21,15 @@ if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
 from dotenv import load_dotenv  # noqa: E402
-from telegram.ext import Application, CommandHandler  # noqa: E402
+from telegram import Update  # noqa: E402
+from telegram.ext import Application, CommandHandler, ContextTypes  # noqa: E402
 from telegram.warnings import PTBUserWarning  # noqa: E402
 
 # Per-message tracking warning is expected for sequential ConversationHandlers.
 warnings.filterwarnings("ignore", message=".*per_message.*", category=PTBUserWarning)
 
 from telegram_bot.handlers import build_conversation_handler, cmd_start  # noqa: E402
-from telegram_bot.scheduler import setup_scheduler  # noqa: E402
+from telegram_bot.scheduler import setup_scheduler, trigger_daily_reminder  # noqa: E402
 
 logging.basicConfig(
     level=logging.INFO,
@@ -38,8 +39,16 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 
+async def cmd_test_scheduled_checkin(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
+    """Manually fire the scheduled check-in flow for testing, without waiting for 21:00."""
+    chat_id = str(update.effective_chat.id)
+    await trigger_daily_reminder(context.application, chat_id)
+
+
 async def _on_startup(app: Application) -> None:
-    scheduler = setup_scheduler(app.bot)
+    scheduler = setup_scheduler(app)
     scheduler.start()
     app.bot_data["scheduler"] = scheduler
     log.info("Scheduler started.")
@@ -70,10 +79,16 @@ def main() -> None:
         .build()
     )
 
+    # Build and store the conversation handler so the scheduler can set
+    # conversation state when it fires automatically at the scheduled time.
+    conv_handler = build_conversation_handler()
+    app.bot_data["conv_handler"] = conv_handler
+
     # /start is registered before the ConversationHandler so it always
     # responds even when a check-in conversation is active.
     app.add_handler(CommandHandler("start", cmd_start))
-    app.add_handler(build_conversation_handler())
+    app.add_handler(conv_handler)
+    app.add_handler(CommandHandler("test_scheduled_checkin", cmd_test_scheduled_checkin))
 
     log.info("Bot starting — polling for updates (drop_pending=True)...")
     app.run_polling(drop_pending_updates=True)
