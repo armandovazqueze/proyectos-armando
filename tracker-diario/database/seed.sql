@@ -22,7 +22,7 @@ INSERT OR IGNORE INTO activities (activity_name, activity_category) VALUES ('Pin
 -- Creativas
 INSERT OR IGNORE INTO activities (activity_name, activity_category) VALUES ('Música',          'Creativas');
 INSERT OR IGNORE INTO activities (activity_name, activity_category) VALUES ('Cantar',          'Creativas');
-INSERT OR IGNORE INTO activities (activity_name, activity_category) VALUES ('Crear contenido', 'Creativas');
+INSERT OR IGNORE INTO activities (activity_name, activity_category) VALUES ('Espiritualidad',  'Creativas');
 
 -- Sociales
 INSERT OR IGNORE INTO activities (activity_name, activity_category) VALUES ('Llamada',        'Sociales');
@@ -91,7 +91,7 @@ INSERT OR IGNORE INTO daily_checkins (
 -- Actividades asociadas a cada check-in
 -- UNIQUE (checkin_id, activity_id) evita duplicados
 -- Movimiento: Caminar=1, Bailar=2, Bicicleta=3, Ping pong=4
--- Creativas:  Música=5, Cantar=6, Crear contenido=7
+-- Creativas:  Música=5, Cantar=6, Espiritualidad=7
 -- Sociales:   Llamada=8, Salida a cenar=9, Salida a comer=10,
 --             Salir a bailar=11, Karaoke=12
 -- Aprendizaje: Claude/IA=13, SQL=14, Python=15, Proyecto personal=16
